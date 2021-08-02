@@ -2,7 +2,7 @@
 
 const slugify = require.main.require('./src/slugify');
 
-const textHeaderRegex = /<p dir="auto">#([a-zA-Z0-9-]*)\((.*)\)<\/p>/g;
+const textHeaderRegex = /<p dir="auto"><a href="[^"]+" class="tag">#([a-zA-Z0-9-]*)<\/a>\((.*)\)<\/p>/g;
 const tooltipRegex = /(<code.*>*?[^]<\/code>)|°(.*)°\((.*)\)/g;
 
 const codeTabRegex = /(?:<p dir="auto">={3}group<\/p>\n)((?:<pre><code class=".+">[^]*?<\/code><\/pre>\n){2,})(?:<p dir="auto">={3}<\/p>)/g;
@@ -33,18 +33,18 @@ const ExtendedMarkdown = {
         callback(null, data);
     },
     // user signature
-    parseSignature(data, callback) {
+    async parseSignature(data) {
         if (data && data.userData && data.userData.signature) {
             data.userData.signature = applyExtendedMarkdown(data.userData.signature);
         }
-        callback(null, data);
+        return data;
     },
     // user description
-    parseAboutMe(data, callback) {
+    async parseAboutMe(data) {
         if (data) {
             data = applyExtendedMarkdown(data);
         }
-        callback(null, data);
+        return data;
     },
     // direct preview in editor
     parseRaw(data, callback) {
