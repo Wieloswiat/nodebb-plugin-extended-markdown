@@ -172,7 +172,7 @@ function generateAnchorFromHeading(heading) {
 
 function applySpoiler(textContent, id) {
     if (textContent.match(spoilerRegex)) {
-        hasher.update(new Uint32Array([id]))
+        hasher.update(new Float64Array([id]))
         const hashedId = hasher.digest().toString("hex");
         let count = 0;
         textContent = textContent.replace(spoilerRegex, (match, text) => {
