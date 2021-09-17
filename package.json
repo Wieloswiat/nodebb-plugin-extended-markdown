@@ -37,5 +37,8 @@
     },
     "peerDependencies": {
         "nodebb-plugin-markdown": "8.x"
+    },
+    "dependencies": {
+        "xxhash-addon": "^1.4.0"
     }
 }
