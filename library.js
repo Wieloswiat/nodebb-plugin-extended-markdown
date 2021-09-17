@@ -1,6 +1,7 @@
 'use strict';
 
 const slugify = require.main.require('./src/slugify');
+const crypto = require('crypto');
 
 const textHeaderRegex = /<p dir="auto"><a href="[^"]+" class="tag">#([a-zA-Z0-9-]*)<\/a>\((.*)\)<\/p>/g;
 const tooltipRegex = /(<code.*>*?[^]<\/code>)|°(.*)°\((.*)\)/g;
@@ -169,10 +170,11 @@ function generateAnchorFromHeading(heading) {
 
 function applySpoiler(textContent, id) {
     if (textContent.match(spoilerRegex)) {
+        const hash = crypto.createHash('md5').update(name).digest('base64url');
         let count = 0;
         textContent = textContent.replace(spoilerRegex, (match, text) => {
-            const spoilerButton = `<p><button class="btn btn-sm btn-primary" name="spoiler" type="button" data-toggle="collapse" data-target="#spoiler${count + id}" aria-expanded="false" aria-controls="spoiler${count + id}">Spoiler <i class="fa fa-eye"></i></button>`;
-            const spoilerContent = `<div class="collapse" id="spoiler${count + id}"><div class="card card-body spoiler">${text}</div></div></p>`;
+            const spoilerButton = `<p><button class="btn btn-sm btn-primary" name="spoiler" type="button" data-toggle="collapse" data-target="#spoiler${count + hash}" aria-expanded="false" aria-controls="spoiler${count + hash}">Spoiler <i class="fa fa-eye"></i></button>`;
+            const spoilerContent = `<div class="collapse" id="spoiler${count + hash}"><div class="card card-body spoiler">${text}</div></div></p>`;
             count++;
             return spoilerButton + spoilerContent;
         });
