@@ -1,7 +1,7 @@
 'use strict';
 
 const slugify = require.main.require('./src/slugify');
-const { XXHash3 } = require('xxhash-addon');
+const { xxhash3 } = require('hash-wasm');
 
 const textHeaderRegex = /<p dir="auto"><a href="[^"]+" class="tag">#([a-zA-Z0-9-]*)<\/a>\((.*)\)<\/p>/g;
 const tooltipRegex = /(<code.*>*?[^]<\/code>)|°(.*)°\((.*)\)/g;
@@ -23,17 +23,15 @@ const noteIcons = {
     important: 'fa-exclamation-circle'
 };
 
-const hasher = new XXHash3();
-
 const ExtendedMarkdown = {
     // post
-    parsePost(data, callback) {
+    async parsePost(data) {
         if (data && data.postData && data.postData.content) {
             data.postData.content = applyExtendedMarkdown(data.postData.content);
             data.postData.content = applyGroupCode(data.postData.content, data.postData.pid);
-            data.postData.content = applySpoiler(data.postData.content, data.postData.pid);
+            data.postData.content = await applySpoiler(data.postData.content, data.postData.pid);
         }
-        callback(null, data);
+        return data;
     },
     // user signature
     async parseSignature(data) {
@@ -60,15 +58,15 @@ const ExtendedMarkdown = {
     },
     registerFormatting(payload, callback) {
         const formatting = [
-            {name: "color", className: "fa fa-eyedropper", title: "[[extendedmarkdown:composer.formatting.color]]"},
-            {name: "left", className: "fa fa-align-left", title: "[[extendedmarkdown:composer.formatting.left]]"},
-            {name: "center", className: "fa fa-align-center", title: "[[extendedmarkdown:composer.formatting.center]]"},
-            {name: "right", className: "fa fa-align-right", title: "[[extendedmarkdown:composer.formatting.right]]"},
-            {name: "justify", className: "fa fa-align-justify", title: "[[extendedmarkdown:composer.formatting.justify]]"},
-            {name: "textheader", className: "fa fa-header", title: "[[extendedmarkdown:composer.formatting.textheader]]"},
-            {name: "groupedcode", className: "fa fa-file-code-o", title: "[[extendedmarkdown:composer.formatting.groupedcode]]"},
-            {name: "bubbleinfo", className: "fa fa-info-circle", title: "[[extendedmarkdown:composer.formatting.bubbleinfo]]"},
-            {name: "spoiler", className: "fa fa-eye-slash", title: "[[extendedmarkdown:composer.formatting.spoiler]]"}
+            { name: "color", className: "fa fa-eyedropper", title: "[[extendedmarkdown:composer.formatting.color]]" },
+            { name: "left", className: "fa fa-align-left", title: "[[extendedmarkdown:composer.formatting.left]]" },
+            { name: "center", className: "fa fa-align-center", title: "[[extendedmarkdown:composer.formatting.center]]" },
+            { name: "right", className: "fa fa-align-right", title: "[[extendedmarkdown:composer.formatting.right]]" },
+            { name: "justify", className: "fa fa-align-justify", title: "[[extendedmarkdown:composer.formatting.justify]]" },
+            { name: "textheader", className: "fa fa-header", title: "[[extendedmarkdown:composer.formatting.textheader]]" },
+            { name: "groupedcode", className: "fa fa-file-code-o", title: "[[extendedmarkdown:composer.formatting.groupedcode]]" },
+            { name: "bubbleinfo", className: "fa fa-info-circle", title: "[[extendedmarkdown:composer.formatting.bubbleinfo]]" },
+            { name: "spoiler", className: "fa fa-eye-slash", title: "[[extendedmarkdown:composer.formatting.spoiler]]" }
         ];
 
         payload.options = payload.options.concat(formatting);
@@ -170,10 +168,10 @@ function generateAnchorFromHeading(heading) {
     return `<a class="anchor-offset" name="${slugify(heading)}"></a>`;
 }
 
-function applySpoiler(textContent, id) {
+async function applySpoiler(textContent, id) {
     if (textContent.match(spoilerRegex)) {
-        hasher.update(new Float64Array([id]))
-        const hashedId = hasher.digest().toString("hex");
+        
+        const hashedId = await xxhash3(id.toString());
         let count = 0;
         textContent = textContent.replace(spoilerRegex, (match, text) => {
             const spoilerButton = `<p><button class="btn btn-sm btn-primary" name="spoiler" type="button" data-toggle="collapse" data-target="#spoiler${count + hashedId}" aria-expanded="false" aria-controls="spoiler${count + hashedId}">Spoiler <i class="fa fa-eye"></i></button>`;
@@ -181,7 +179,6 @@ function applySpoiler(textContent, id) {
             count++;
             return spoilerButton + spoilerContent;
         });
-        hasher.reset();
     }
     return textContent;
 }
