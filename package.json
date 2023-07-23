@@ -1,6 +1,6 @@
 {
     "name": "nodebb-plugin-ws-extended-markdown",
-    "version": "1.6.1",
+    "version": "2.0.1",
     "description": "A NodeBB plugin to add some bb code, as tooltip, anchor, custom text header with background, etc.",
     "main": "library.js",
     "repository": {
@@ -33,12 +33,12 @@
     },
     "homepage": "https://github.com/MinecraftForgeFrance/nodebb-plugin-extended-markdown#readme",
     "nbbpm": {
-        "compatibility": "^2.0.0"
+        "compatibility": "^3.0.0"
     },
     "dependencies": {
         "hash-wasm": "^4.9.0"
     },
     "peerDependencies": {
-        "nodebb-plugin-ws-markdown": "^9.0.0 || ^10.0.0"
+        "nodebb-plugin-ws-markdown": "^12.0.0"
     }
 }

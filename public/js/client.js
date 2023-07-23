@@ -21,11 +21,13 @@ $(document).ready(function () {
             // params is (language, namespace, callback)
             translator.getTranslations(window.config.userLang || window.config.defaultLang, 'extendedmarkdown', function (strings) {
                 var composerTextarea;
-                var colorPickerButton = document.querySelector('li[data-format="color"]');
+                var colorPickerButton = document.querySelector('.btn[data-format="color"]');
                 var hiddenPicker = document.createElement("input");
                 hiddenPicker.style.visibility = 'hidden';
                 hiddenPicker.style.width = 0;
                 hiddenPicker.style.padding = 0;
+                hiddenPicker.style.margin = 0;
+                hiddenPicker.style.height = 0;
                 hiddenPicker.style.border = 0;
                 hiddenPicker.type = 'color';
                 hiddenPicker.id = 'nodebb-plugin-extended-markdown-colorpicker';
@@ -118,24 +120,29 @@ $(document).ready(function () {
                         controls.updateTextareaSelection(textarea, selectionEnd + 3 - wrapDelta[1], selectionEnd + strings.bubbleinfo_text.length + 3 - wrapDelta[1]);
                     }
                 });
-                formatting.addButtonDispatch('spoiler', function (textearea, selectionStart, selectionEnd) {
+                formatting.addButtonDispatch('spoiler', function (textarea, selectionStart, selectionEnd) {
                     if (selectionStart === selectionEnd) {
-                        controls.insertIntoTextarea(textearea, "||" + strings.spoiler + "||");
-                        controls.updateTextareaSelection(textearea, selectionStart + 2, selectionStart + 2 + strings.spoiler.length);
+                        controls.insertIntoTextarea(textarea, "||" + strings.spoiler + "||");
+                        controls.updateTextareaSelection(textarea, selectionStart + 2, selectionStart + 2 + strings.spoiler.length);
                     } else {
-                        controls.wrapSelectionInTextareaWith(textearea, "||", "||");
-                        controls.updateTextareaSelection(textearea, selectionStart + 2, selectionEnd + 2);
+                        controls.wrapSelectionInTextareaWith(textarea, "||", "||");
+                        controls.updateTextareaSelection(textarea, selectionStart + 2, selectionEnd + 2);
                     }
                 });
             });
         }
     };
 
-    function pageReady() {
-        $('[data-toggle="tooltip"]').tooltip();
-        document.querySelectorAll('button[type=button][name=spoiler]').forEach(function(element) {
+    async function pageReady() {
+        // TODO: find a way to import bootstrap, required for tooltip.
+        //var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+        //tooltipTriggerList.map(function (tooltipTriggerEl) {
+        //    return new bootstrap.Tooltip(tooltipTriggerEl);
+        //});
+
+        document.querySelectorAll('button.extended-markdown-spoiler').forEach(function (element) {
             element.onclick = function() {
-                element.children[0].className = element.attributes.getNamedItem("aria-expanded").value === "false" ? "fa fa-eye-slash" : "fa fa-eye";
+                element.children[0].className = element.attributes.getNamedItem("aria-expanded").value === "true" ? "fa fa-eye-slash" : "fa fa-eye";
             };
         });
     }

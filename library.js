@@ -97,9 +97,9 @@ function applyExtendedMarkdown(textContent) {
             if (typeof (code) !== "undefined") {
                 return code;
             } else if ("fa-info" === text) {
-                return `<i class="fa fa-info-circle extended-markdown-tooltip" data-toggle="tooltip" title="${tooltipText}"></i>`;
+                return `<i class="fa fa-info-circle extended-markdown-tooltip" data-bs-toggle="tooltip" data-bs-placement="top" title="${tooltipText}"></i>`;
             } else {
-                return `<span class="extended-markdown-tooltip" data-toggle="tooltip" title="${tooltipText}">${text}</span>`;
+                return `<span class="extended-markdown-tooltip" data-bs-toggle="tooltip" data-bs-placement="top" title="${tooltipText}">${text}</span>`;
             }
         });
     }
@@ -174,10 +174,17 @@ async function applySpoiler(textContent, id) {
         const hashedId = await xxhash3(id.toString());
         let count = 0;
         textContent = textContent.replace(spoilerRegex, (match, text) => {
-            const spoilerButton = `<p><button class="btn btn-sm btn-primary" name="spoiler" type="button" data-toggle="collapse" data-target="#spoiler${count + hashedId}" aria-expanded="false" aria-controls="spoiler${count + hashedId}">Spoiler <i class="fa fa-eye"></i></button>`;
-            const spoilerContent = `<div class="collapse" id="spoiler${count + hashedId}"><div class="card card-body spoiler">${text}</div></div></p>`;
+            const spoilerButton = `
+                <button class="btn btn-primary extended-markdown-spoiler" type="button" name="spoiler" data-bs-toggle="collapse" data-bs-target="#spoiler${count + hashedId}" aria-expanded="false" aria-controls="spoiler${count + hashedId}">
+                    Spoiler <i class="fa fa-eye"></i>
+                </button>`;
+
+            const spoilerContent = `
+                <div class="collapse" id="spoiler${count + hashedId}">
+                    <div class="card card-body spoiler">${text}</div>
+                </div>`;
             count++;
-            return spoilerButton + spoilerContent;
+            return `<p>${spoilerButton}${spoilerContent}</p>`;
         });
     }
     return textContent;
